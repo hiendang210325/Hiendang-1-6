@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Hiệu ứng chữ và trái tim rơi TikTok</title>
+    <title>Hiệu ứng chữ, trái tim và ảnh rơi TikTok</title>
     <style>
       * {
         margin: 0;
@@ -45,6 +45,7 @@
         animation: fallStraightAndTilt linear;
         letter-spacing: 1px;
         transform-origin: center;
+        z-index: 10;
       }
 
       .falling-heart {
@@ -52,11 +53,25 @@
         pointer-events: none;
         animation: fallAndFloat linear;
         transform-origin: center;
-        z-index: 9999;
+        z-index: 15;
         font-size: 32px;
         filter: drop-shadow(0 0 10px currentColor);
         display: block;
         line-height: 1;
+      }
+
+      .falling-image {
+        position: absolute;
+        pointer-events: none;
+        animation: fallWithRotation linear;
+        transform-origin: center;
+        z-index: 5;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
+          0 0 40px rgba(255, 192, 203, 0.2);
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.2);
       }
 
       @keyframes fallStraightAndTilt {
@@ -93,6 +108,34 @@
         }
       }
 
+      @keyframes fallWithRotation {
+        0% {
+          transform: translateY(-120px) rotate(0deg) scale(0.8);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+          transform: translateY(-80px) rotate(15deg) scale(1);
+        }
+        25% {
+          transform: translateY(20vh) rotate(-10deg) scale(1.05);
+        }
+        50% {
+          transform: translateY(50vh) rotate(20deg) scale(0.95);
+        }
+        75% {
+          transform: translateY(75vh) rotate(-15deg) scale(1.02);
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(calc(100vh + 120px)) rotate(30deg) scale(0.9);
+          opacity: 0;
+        }
+      }
+
       @keyframes heartBeat {
         0%,
         100% {
@@ -116,6 +159,10 @@
         }
         .falling-heart {
           font-size: 28px;
+        }
+        .falling-image {
+          width: 60px !important;
+          height: 100px !important;
         }
       }
     </style>
@@ -187,6 +234,15 @@
         "#880e4f",
       ];
 
+      const imageList = [
+        "images/images1.jpg",
+        "images/images2.jpg",
+        "images/images3.jpg",
+        "images/images4.jpg",
+        "images/images5.jpg",
+        "images/images6.jpg",
+      ];
+
       function getRandomColor() {
         return textColors[Math.floor(Math.random() * textColors.length)];
       }
@@ -199,9 +255,18 @@
         return heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
       }
 
+      function getRandomImage() {
+        return imageList[Math.floor(Math.random() * imageList.length)];
+      }
+
       function getRandomSize() {
         const isMobile = window.innerWidth <= 768;
         return isMobile ? Math.random() * 10 + 14 : Math.random() * 25 + 18;
+      }
+
+      function getRandomImageSize() {
+        const isMobile = window.innerWidth <= 768;
+        return isMobile ? Math.random() * 20 + 50 : Math.random() * 60 + 120;
       }
 
       function getRandomMessage() {
@@ -298,13 +363,6 @@
         heart.style.animationDuration = duration + "s";
         heart.style.opacity = "1";
 
-        console.log(
-          "Creating heart at position:",
-          leftPos,
-          "with duration:",
-          duration
-        );
-
         container.appendChild(heart);
         activeElements.add(heart);
 
@@ -316,8 +374,55 @@
         }, duration * 1000);
       }
 
+      function createFallingImage() {
+        if (!isRunning) return;
+
+        const container = document.getElementById("container");
+        const img = document.createElement("img");
+        img.className = "falling-image";
+
+        img.src = getRandomImage();
+        img.alt = "Falling image";
+
+        const size = getRandomImageSize();
+        img.style.width = size + "px";
+        img.style.height = size + "px";
+
+        const maxWidth = window.innerWidth;
+        const leftPos = Math.random() * (maxWidth - size);
+        img.style.left = leftPos + "px";
+        img.style.top = "-120px";
+
+        const duration = Math.random() * 4 + 5;
+        img.style.animationDuration = duration + "s";
+
+        img.style.opacity = Math.random() * 0.3 + 0.7;
+
+        img.onerror = function () {
+          if (this.parentNode) {
+            this.parentNode.removeChild(this);
+            activeElements.delete(this);
+          }
+        };
+
+        img.onload = function () {
+          console.log("Image loaded successfully:", this.src);
+        };
+
+        container.appendChild(img);
+        activeElements.add(img);
+
+        setTimeout(() => {
+          if (img.parentNode) {
+            img.parentNode.removeChild(img);
+            activeElements.delete(img);
+          }
+        }, duration * 1000);
+      }
+
       const CONTINUOUS_TEXT_INTERVAL = window.innerWidth <= 768 ? 100 : 150;
       const CONTINUOUS_HEART_INTERVAL = 200;
+      const CONTINUOUS_IMAGE_INTERVAL = 800;
 
       document.addEventListener("visibilitychange", () => {
         isRunning = !document.hidden;
@@ -337,9 +442,11 @@
 
       setInterval(createFallingText, CONTINUOUS_TEXT_INTERVAL);
       setInterval(createFallingHeart, CONTINUOUS_HEART_INTERVAL);
+      setInterval(createFallingImage, CONTINUOUS_IMAGE_INTERVAL);
 
       const initialBurst = window.innerWidth <= 768 ? 30 : 35;
       const initialHearts = 5;
+      const initialImages = 3;
 
       for (let i = 0; i < initialBurst; i++) {
         setTimeout(createFallingText, i * 80);
@@ -349,12 +456,23 @@
         setTimeout(createFallingHeart, i * 100);
       }
 
+      for (let i = 0; i < initialImages; i++) {
+        setTimeout(createFallingImage, i * 300);
+      }
+
       setInterval(() => {
         if (!isRunning) return;
         for (let i = 0; i < 5; i++) {
           setTimeout(createFallingHeart, i * 80);
         }
       }, 12000);
+
+      setInterval(() => {
+        if (!isRunning) return;
+        for (let i = 0; i < 2; i++) {
+          setTimeout(createFallingImage, i * 400);
+        }
+      }, 15000);
     </script>
   </body>
 </html>
