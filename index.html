@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Hiệu ứng chữ và trái tim rơi TikTok</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background: #000;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        font-family: "Arial", sans-serif;
+        position: fixed;
+        width: 100%;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+      }
+
+      .falling-text {
+        position: absolute;
+        color: #fff;
+        font-weight: 600;
+        font-style: italic;
+        white-space: nowrap;
+        pointer-events: none;
+        filter: blur(0px);
+        text-shadow: 0 0 20px currentColor, 0 0 30px currentColor,
+          0 0 40px currentColor;
+        animation: fallStraightAndTilt linear;
+        letter-spacing: 1px;
+        transform-origin: center;
+      }
+
+      .falling-heart {
+        position: absolute;
+        pointer-events: none;
+        animation: fallAndFloat linear;
+        transform-origin: center;
+        z-index: 9999;
+        font-size: 32px;
+        filter: drop-shadow(0 0 10px currentColor);
+        display: block;
+        line-height: 1;
+      }
+
+      @keyframes fallStraightAndTilt {
+        0% {
+          transform: translateY(-100px) rotate(15deg) skewX(-5deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(50vh) rotate(-10deg) skewX(3deg);
+        }
+        85% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(calc(100vh + 100px)) rotate(-15deg) skewX(-7deg);
+          opacity: 0;
+        }
+      }
+
+      @keyframes fallAndFloat {
+        0% {
+          transform: translateY(-100px) translateX(0px);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(calc(100vh + 100px)) translateX(0px);
+          opacity: 0;
+        }
+      }
+
+      @keyframes heartBeat {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        25% {
+          transform: scale(1.2);
+        }
+        50% {
+          transform: scale(0.9);
+        }
+        75% {
+          transform: scale(1.1);
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        .falling-text {
+          font-size: 16px !important;
+          letter-spacing: 0.5px;
+        }
+        .falling-heart {
+          font-size: 28px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container" id="container"></div>
+
+    <script>
+      let isRunning = true;
+      let activeElements = new Set();
+
+      const messages = [
+        "Happy Children's Day 🌟",
+        "Forever young at heart 💫",
+        "Keep your inner child alive",
+        "Your smile lights up my world",
+        "Forever my little princess",
+        "Happy Children's Day my love",
+        "Happy June 1st my love",
+        "I wish you always happy like a child",
+      ];
+
+      const textColors = [
+        "#ffffff",
+        "#ff69b4",
+        "#da70d6",
+        "#ba55d3",
+        "#9370db",
+        "#8a2be2",
+        "#dda0dd",
+        "#ffb6c1",
+        "#ffc0cb",
+      ];
+
+      const heartSymbols = [
+        "❤️",
+        "💖",
+        "💕",
+        "💗",
+        "💓",
+        "💘",
+        "💝",
+        "💜",
+        "🧡",
+        "💛",
+        "💚",
+        "💙",
+        "🤍",
+        "🖤",
+        "♥️",
+        "💋",
+      ];
+
+      const heartColors = [
+        "#ff4500",
+        "#ff1493",
+        "#ff69b4",
+        "#ff6b35",
+        "#ff0000",
+        "#ff007f",
+        "#dc143c",
+        "#b22222",
+        "#ff6347",
+        "#ff4081",
+        "#e91e63",
+        "#f06292",
+        "#ad1457",
+        "#880e4f",
+      ];
+
+      function getRandomColor() {
+        return textColors[Math.floor(Math.random() * textColors.length)];
+      }
+
+      function getRandomHeartColor() {
+        return heartColors[Math.floor(Math.random() * heartColors.length)];
+      }
+
+      function getRandomHeartSymbol() {
+        return heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+      }
+
+      function getRandomSize() {
+        const isMobile = window.innerWidth <= 768;
+        return isMobile ? Math.random() * 10 + 14 : Math.random() * 25 + 18;
+      }
+
+      function getRandomMessage() {
+        return messages[Math.floor(Math.random() * messages.length)];
+      }
+
+      function cleanup() {
+        activeElements.forEach((element) => {
+          if (element.parentNode) {
+            element.parentNode.removeChild(element);
+          }
+        });
+        activeElements.clear();
+      }
+
+      function createFallingText() {
+        if (!isRunning) return;
+
+        const container = document.getElementById("container");
+        const text = document.createElement("div");
+        text.className = "falling-text";
+        text.textContent = getRandomMessage();
+
+        const maxWidth = window.innerWidth;
+        const isMobile = maxWidth <= 768;
+        const textPadding = isMobile ? 20 : 100;
+
+        let leftPosition;
+        const positionBias = Math.random();
+
+        if (isMobile) {
+          if (positionBias < 0.4) {
+            leftPosition = Math.random() * (maxWidth * 0.4);
+          } else if (positionBias < 0.8) {
+            const centerArea = maxWidth * 0.5;
+            const centerStart = (maxWidth - centerArea) / 2;
+            leftPosition = centerStart + Math.random() * centerArea;
+          } else {
+            leftPosition =
+              maxWidth * 0.6 + Math.random() * (maxWidth * 0.4 - textPadding);
+          }
+        } else {
+          leftPosition = Math.random() * (maxWidth - textPadding);
+        }
+
+        text.style.left = leftPosition + "px";
+        text.style.top = "-100px";
+        text.style.fontSize = getRandomSize() + "px";
+        text.style.color = getRandomColor();
+
+        const randomRotate = Math.random() * 30;
+        const randomSkew = Math.random() * 10 - 5;
+        text.style.transform = `rotate(${randomRotate}deg) skewX(${-Math.abs(
+          randomSkew
+        )}deg)`;
+
+        const duration = isMobile
+          ? Math.random() * 3 + 4
+          : Math.random() * 4 + 6;
+        text.style.animationDuration = duration + "s";
+        text.style.opacity = Math.random() * 0.4 + 0.6;
+
+        container.appendChild(text);
+        activeElements.add(text);
+
+        setTimeout(() => {
+          if (text.parentNode) {
+            text.parentNode.removeChild(text);
+            activeElements.delete(text);
+          }
+        }, duration * 1000);
+      }
+
+      function createFallingHeart() {
+        if (!isRunning) return;
+
+        const container = document.getElementById("container");
+        const heart = document.createElement("div");
+        heart.className = "falling-heart";
+
+        heart.innerHTML = "♥";
+        heart.style.color = getRandomHeartColor();
+        heart.style.fontSize = Math.random() * 20 + 30 + "px";
+
+        heart.style.backgroundColor = "rgba(255,255,255,0.1)";
+        heart.style.padding = "5px";
+        heart.style.borderRadius = "50%";
+
+        const leftPos = Math.random() * (window.innerWidth - 60);
+        heart.style.left = leftPos + "px";
+        heart.style.top = "-60px";
+
+        const duration = Math.random() * 3 + 4;
+        heart.style.animationDuration = duration + "s";
+        heart.style.opacity = "1";
+
+        console.log(
+          "Creating heart at position:",
+          leftPos,
+          "with duration:",
+          duration
+        );
+
+        container.appendChild(heart);
+        activeElements.add(heart);
+
+        setTimeout(() => {
+          if (heart.parentNode) {
+            heart.parentNode.removeChild(heart);
+            activeElements.delete(heart);
+          }
+        }, duration * 1000);
+      }
+
+      const CONTINUOUS_TEXT_INTERVAL = window.innerWidth <= 768 ? 100 : 150;
+      const CONTINUOUS_HEART_INTERVAL = 200;
+
+      document.addEventListener("visibilitychange", () => {
+        isRunning = !document.hidden;
+        if (document.hidden) {
+          cleanup();
+        }
+      });
+
+      window.addEventListener("blur", () => {
+        isRunning = false;
+        cleanup();
+      });
+
+      window.addEventListener("focus", () => {
+        isRunning = true;
+      });
+
+      setInterval(createFallingText, CONTINUOUS_TEXT_INTERVAL);
+      setInterval(createFallingHeart, CONTINUOUS_HEART_INTERVAL);
+
+      const initialBurst = window.innerWidth <= 768 ? 30 : 35;
+      const initialHearts = 5;
+
+      for (let i = 0; i < initialBurst; i++) {
+        setTimeout(createFallingText, i * 80);
+      }
+
+      for (let i = 0; i < initialHearts; i++) {
+        setTimeout(createFallingHeart, i * 100);
+      }
+
+      setInterval(() => {
+        if (!isRunning) return;
+        for (let i = 0; i < 5; i++) {
+          setTimeout(createFallingHeart, i * 80);
+        }
+      }, 12000);
+    </script>
+  </body>
+</html>
