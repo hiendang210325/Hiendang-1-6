@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Hiệu ứng chữ, trái tim và ảnh rơi TikTok</title>
+    <title>Happy Children's Day 1-6</title>
     <style>
       * {
         margin: 0;
@@ -23,6 +23,8 @@
         font-family: "Arial", sans-serif;
         position: fixed;
         width: 100%;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
       .container {
@@ -30,6 +32,8 @@
         width: 100%;
         height: 100vh;
         height: 100dvh;
+        transform: translateZ(0);
+        will-change: transform;
       }
 
       .falling-text {
@@ -46,6 +50,9 @@
         letter-spacing: 1px;
         transform-origin: center;
         z-index: 10;
+        will-change: transform, opacity;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
       }
 
       .falling-heart {
@@ -58,6 +65,9 @@
         filter: drop-shadow(0 0 10px currentColor);
         display: block;
         line-height: 1;
+        will-change: transform, opacity;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
       }
 
       .falling-image {
@@ -72,66 +82,72 @@
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         object-fit: cover;
         border: 2px solid rgba(255, 255, 255, 0.2);
+        will-change: transform, opacity;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transform: translateZ(0);
       }
 
       @keyframes fallStraightAndTilt {
         0% {
-          transform: translateY(-100px) rotate(15deg) skewX(-5deg);
+          transform: translate3d(0, -100px, 0) rotate(15deg) skewX(-5deg);
           opacity: 0;
         }
         10% {
           opacity: 1;
         }
         50% {
-          transform: translateY(50vh) rotate(-10deg) skewX(3deg);
+          transform: translate3d(0, 50vh, 0) rotate(-10deg) skewX(3deg);
         }
         85% {
           opacity: 0.8;
         }
         100% {
-          transform: translateY(calc(100vh + 100px)) rotate(-15deg) skewX(-7deg);
+          transform: translate3d(0, calc(100vh + 100px), 0) rotate(-15deg)
+            skewX(-7deg);
           opacity: 0;
         }
       }
 
       @keyframes fallAndFloat {
         0% {
-          transform: translateY(-100px) translateX(0px);
+          transform: translate3d(0, -100px, 0);
           opacity: 0;
         }
         10% {
           opacity: 1;
         }
         100% {
-          transform: translateY(calc(100vh + 100px)) translateX(0px);
+          transform: translate3d(0, calc(100vh + 100px), 0);
           opacity: 0;
         }
       }
 
       @keyframes fallWithRotation {
         0% {
-          transform: translateY(-120px) rotate(0deg) scale(0.8);
+          transform: translate3d(0, -120px, 0) rotate(0deg) scale(0.8);
           opacity: 0;
         }
         10% {
           opacity: 1;
-          transform: translateY(-80px) rotate(15deg) scale(1);
+          transform: translate3d(0, -80px, 0) rotate(15deg) scale(1);
         }
         25% {
-          transform: translateY(20vh) rotate(-10deg) scale(1.05);
+          transform: translate3d(0, 20vh, 0) rotate(-10deg) scale(1.05);
         }
         50% {
-          transform: translateY(50vh) rotate(20deg) scale(0.95);
+          transform: translate3d(0, 50vh, 0) rotate(20deg) scale(0.95);
         }
         75% {
-          transform: translateY(75vh) rotate(-15deg) scale(1.02);
+          transform: translate3d(0, 75vh, 0) rotate(-15deg) scale(1.02);
           opacity: 0.8;
         }
         90% {
           opacity: 0.5;
         }
         100% {
-          transform: translateY(calc(100vh + 120px)) rotate(30deg) scale(0.9);
+          transform: translate3d(0, calc(100vh + 120px), 0) rotate(30deg)
+            scale(0.9);
           opacity: 0;
         }
       }
@@ -156,13 +172,17 @@
         .falling-text {
           font-size: 16px !important;
           letter-spacing: 0.5px;
+          text-shadow: 0 0 10px currentColor, 0 0 15px currentColor;
         }
         .falling-heart {
           font-size: 28px;
+          filter: drop-shadow(0 0 5px currentColor);
         }
         .falling-image {
           width: 60px !important;
           height: 100px !important;
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         }
       }
     </style>
@@ -243,6 +263,47 @@
         "images/images6.jpg",
       ];
 
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        ) || window.innerWidth <= 768;
+
+      const CONFIG = {
+        text: {
+          interval: isMobile ? 200 : 150,
+          initialBurst: isMobile ? 15 : 20,
+          burstDelay: isMobile ? 120 : 80,
+          periodicBurst: {
+            count: isMobile ? 8 : 12,
+            interval: isMobile ? 5000 : 4000,
+            delay: isMobile ? 150 : 100,
+          },
+        },
+        heart: {
+          interval: isMobile ? 500 : 250,
+          initialBurst: isMobile ? 5 : 12,
+          burstDelay: isMobile ? 200 : 100,
+          periodicBurst: {
+            count: isMobile ? 3 : 8,
+            interval: isMobile ? 12000 : 6000,
+            delay: isMobile ? 200 : 80,
+          },
+        },
+        image: {
+          interval: isMobile ? 1200 : 600,
+          initialBurst: isMobile ? 3 : 8,
+          burstDelay: isMobile ? 400 : 200,
+          periodicBurst: {
+            count: isMobile ? 2 : 5,
+            interval: isMobile ? 15000 : 8000,
+            delay: isMobile ? 600 : 300,
+          },
+        },
+        cleanup: {
+          interval: isMobile ? 2000 : 2000,
+        },
+      };
+
       function getRandomColor() {
         return textColors[Math.floor(Math.random() * textColors.length)];
       }
@@ -260,13 +321,11 @@
       }
 
       function getRandomSize() {
-        const isMobile = window.innerWidth <= 768;
-        return isMobile ? Math.random() * 10 + 14 : Math.random() * 25 + 18;
+        return isMobile ? Math.random() * 6 + 14 : Math.random() * 20 + 20;
       }
 
       function getRandomImageSize() {
-        const isMobile = window.innerWidth <= 768;
-        return isMobile ? Math.random() * 20 + 50 : Math.random() * 60 + 120;
+        return isMobile ? Math.random() * 10 + 45 : Math.random() * 40 + 100;
       }
 
       function getRandomMessage() {
@@ -274,12 +333,55 @@
       }
 
       function cleanup() {
+        const elementsToRemove = [];
+
         activeElements.forEach((element) => {
+          if (
+            !element.parentNode ||
+            element.getBoundingClientRect().top > window.innerHeight + 150 ||
+            element.getBoundingClientRect().bottom < -150
+          ) {
+            elementsToRemove.push(element);
+          }
+        });
+
+        elementsToRemove.forEach((element) => {
           if (element.parentNode) {
             element.parentNode.removeChild(element);
           }
+          activeElements.delete(element);
         });
-        activeElements.clear();
+
+        const maxElements = isMobile ? 60 : 80;
+        const cleanupCount = isMobile ? 20 : 30;
+
+        if (activeElements.size > maxElements) {
+          const elementsArray = Array.from(activeElements);
+          const toRemove = elementsArray.slice(0, cleanupCount);
+
+          toRemove.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.removeChild(element);
+            }
+            activeElements.delete(element);
+          });
+          console.log(`Mobile cleanup: removed ${cleanupCount} elements`);
+        }
+
+        console.log(`Active elements: ${activeElements.size}`);
+      }
+
+      function createElementWithCleanup(element, duration) {
+        activeElements.add(element);
+
+        const bufferTime = isMobile ? 200 : 500;
+
+        setTimeout(() => {
+          if (element.parentNode) {
+            element.parentNode.removeChild(element);
+          }
+          activeElements.delete(element);
+        }, duration * 1000 + bufferTime);
       }
 
       function createFallingText() {
@@ -291,53 +393,41 @@
         text.textContent = getRandomMessage();
 
         const maxWidth = window.innerWidth;
-        const isMobile = maxWidth <= 768;
-        const textPadding = isMobile ? 20 : 100;
+        const textPadding = isMobile ? 20 : 50;
 
         let leftPosition;
-        const positionBias = Math.random();
+        const positionRandom = Math.random();
 
-        if (isMobile) {
-          if (positionBias < 0.4) {
-            leftPosition = Math.random() * (maxWidth * 0.4);
-          } else if (positionBias < 0.8) {
-            const centerArea = maxWidth * 0.5;
-            const centerStart = (maxWidth - centerArea) / 2;
-            leftPosition = centerStart + Math.random() * centerArea;
-          } else {
-            leftPosition =
-              maxWidth * 0.6 + Math.random() * (maxWidth * 0.4 - textPadding);
-          }
+        if (positionRandom < 0.6) {
+          leftPosition = Math.random() * (maxWidth * 0.4);
+        } else if (positionRandom < 0.9) {
+          leftPosition = maxWidth * 0.4 + Math.random() * (maxWidth * 0.3);
         } else {
-          leftPosition = Math.random() * (maxWidth - textPadding);
+          leftPosition =
+            maxWidth * 0.7 + Math.random() * (maxWidth * 0.3 - textPadding);
         }
 
-        text.style.left = leftPosition + "px";
-        text.style.top = "-100px";
-        text.style.fontSize = getRandomSize() + "px";
-        text.style.color = getRandomColor();
-
-        const randomRotate = Math.random() * 30;
-        const randomSkew = Math.random() * 10 - 5;
-        text.style.transform = `rotate(${randomRotate}deg) skewX(${-Math.abs(
-          randomSkew
-        )}deg)`;
-
         const duration = isMobile
-          ? Math.random() * 3 + 4
-          : Math.random() * 4 + 6;
-        text.style.animationDuration = duration + "s";
-        text.style.opacity = Math.random() * 0.4 + 0.6;
+          ? Math.random() * 2 + 4
+          : Math.random() * 3 + 5;
+
+        const styles = {
+          left: leftPosition + "px",
+          top: "-100px",
+          fontSize: getRandomSize() + "px",
+          color: getRandomColor(),
+          animationDuration: duration + "s",
+          opacity: Math.random() * 0.4 + 0.7,
+        };
+
+        Object.assign(text.style, styles);
+
+        const randomRotate = Math.random() * 20 - 10;
+        const randomSkew = Math.random() * 6 - 3;
+        text.style.transform = `rotate(${randomRotate}deg) skewX(${randomSkew}deg)`;
 
         container.appendChild(text);
-        activeElements.add(text);
-
-        setTimeout(() => {
-          if (text.parentNode) {
-            text.parentNode.removeChild(text);
-            activeElements.delete(text);
-          }
-        }, duration * 1000);
+        createElementWithCleanup(text, duration);
       }
 
       function createFallingHeart() {
@@ -346,32 +436,39 @@
         const container = document.getElementById("container");
         const heart = document.createElement("div");
         heart.className = "falling-heart";
+        heart.innerHTML = getRandomHeartSymbol();
 
-        heart.innerHTML = "♥";
-        heart.style.color = getRandomHeartColor();
-        heart.style.fontSize = Math.random() * 20 + 30 + "px";
+        const duration = isMobile
+          ? Math.random() * 2 + 3
+          : Math.random() * 2 + 4;
 
-        heart.style.backgroundColor = "rgba(255,255,255,0.1)";
-        heart.style.padding = "5px";
-        heart.style.borderRadius = "50%";
+        const maxWidth = window.innerWidth;
+        let leftPosition;
+        const positionRandom = Math.random();
 
-        const leftPos = Math.random() * (window.innerWidth - 60);
-        heart.style.left = leftPos + "px";
-        heart.style.top = "-60px";
+        if (positionRandom < 0.6) {
+          leftPosition = Math.random() * (maxWidth * 0.4);
+        } else if (positionRandom < 0.9) {
+          leftPosition = maxWidth * 0.4 + Math.random() * (maxWidth * 0.3);
+        } else {
+          leftPosition = maxWidth * 0.7 + Math.random() * (maxWidth * 0.3 - 50);
+        }
 
-        const duration = Math.random() * 3 + 4;
-        heart.style.animationDuration = duration + "s";
-        heart.style.opacity = "1";
+        const styles = {
+          color: getRandomHeartColor(),
+          fontSize:
+            (isMobile ? Math.random() * 15 + 25 : Math.random() * 20 + 30) +
+            "px",
+          left: leftPosition + "px",
+          top: "-60px",
+          animationDuration: duration + "s",
+          opacity: Math.random() * 0.3 + 0.8,
+        };
+
+        Object.assign(heart.style, styles);
 
         container.appendChild(heart);
-        activeElements.add(heart);
-
-        setTimeout(() => {
-          if (heart.parentNode) {
-            heart.parentNode.removeChild(heart);
-            activeElements.delete(heart);
-          }
-        }, duration * 1000);
+        createElementWithCleanup(heart, duration);
       }
 
       function createFallingImage() {
@@ -385,94 +482,145 @@
         img.alt = "Falling image";
 
         const size = getRandomImageSize();
-        img.style.width = size + "px";
-        img.style.height = size + "px";
+        const duration = isMobile
+          ? Math.random() * 2 + 4
+          : Math.random() * 3 + 5;
 
         const maxWidth = window.innerWidth;
-        const leftPos = Math.random() * (maxWidth - size);
-        img.style.left = leftPos + "px";
-        img.style.top = "-120px";
+        let leftPosition;
+        const positionRandom = Math.random();
 
-        const duration = Math.random() * 4 + 5;
-        img.style.animationDuration = duration + "s";
+        if (positionRandom < 0.6) {
+          leftPosition = Math.random() * (maxWidth * 0.4);
+        } else if (positionRandom < 0.9) {
+          leftPosition = maxWidth * 0.4 + Math.random() * (maxWidth * 0.3);
+        } else {
+          leftPosition =
+            maxWidth * 0.7 + Math.random() * (maxWidth * 0.3 - size);
+        }
 
-        img.style.opacity = Math.random() * 0.3 + 0.7;
+        const styles = {
+          width: size + "px",
+          height: size + "px",
+          left: leftPosition + "px",
+          top: "-120px",
+          animationDuration: duration + "s",
+          opacity: Math.random() * 0.3 + 0.7,
+        };
+
+        Object.assign(img.style, styles);
 
         img.onerror = function () {
           if (this.parentNode) {
             this.parentNode.removeChild(this);
-            activeElements.delete(this);
           }
-        };
-
-        img.onload = function () {
-          console.log("Image loaded successfully:", this.src);
+          activeElements.delete(this);
         };
 
         container.appendChild(img);
-        activeElements.add(img);
-
-        setTimeout(() => {
-          if (img.parentNode) {
-            img.parentNode.removeChild(img);
-            activeElements.delete(img);
-          }
-        }, duration * 1000);
+        createElementWithCleanup(img, duration);
       }
 
-      const CONTINUOUS_TEXT_INTERVAL = window.innerWidth <= 768 ? 100 : 150;
-      const CONTINUOUS_HEART_INTERVAL = 200;
-      const CONTINUOUS_IMAGE_INTERVAL = 800;
+      let intervals = {};
+
+      function startAllIntervals() {
+        if (intervals.text) return;
+
+        console.log("Starting intervals...");
+
+        intervals.text = setInterval(createFallingText, CONFIG.text.interval);
+        intervals.heart = setInterval(
+          createFallingHeart,
+          CONFIG.heart.interval
+        );
+        intervals.image = setInterval(
+          createFallingImage,
+          CONFIG.image.interval
+        );
+        intervals.cleanup = setInterval(cleanup, CONFIG.cleanup.interval);
+
+        intervals.textBurst = setInterval(() => {
+          if (!isRunning) return;
+          for (let i = 0; i < CONFIG.text.periodicBurst.count; i++) {
+            setTimeout(createFallingText, i * CONFIG.text.periodicBurst.delay);
+          }
+        }, CONFIG.text.periodicBurst.interval);
+
+        intervals.heartBurst = setInterval(() => {
+          if (!isRunning) return;
+          for (let i = 0; i < CONFIG.heart.periodicBurst.count; i++) {
+            setTimeout(
+              createFallingHeart,
+              i * CONFIG.heart.periodicBurst.delay
+            );
+          }
+        }, CONFIG.heart.periodicBurst.interval);
+
+        intervals.imageBurst = setInterval(() => {
+          if (!isRunning) return;
+          for (let i = 0; i < CONFIG.image.periodicBurst.count; i++) {
+            setTimeout(
+              createFallingImage,
+              i * CONFIG.image.periodicBurst.delay
+            );
+          }
+        }, CONFIG.image.periodicBurst.interval);
+      }
+
+      function stopAllIntervals() {
+        Object.values(intervals).forEach((interval) => {
+          if (interval) clearInterval(interval);
+        });
+        intervals = {};
+        console.log("All intervals stopped");
+      }
 
       document.addEventListener("visibilitychange", () => {
-        isRunning = !document.hidden;
         if (document.hidden) {
-          cleanup();
+          isRunning = false;
+          stopAllIntervals();
+        } else {
+          isRunning = true;
+          startAllIntervals();
+          createInitialBurst();
         }
       });
 
       window.addEventListener("blur", () => {
         isRunning = false;
-        cleanup();
+        stopAllIntervals();
       });
 
       window.addEventListener("focus", () => {
         isRunning = true;
+        startAllIntervals();
+        createInitialBurst();
       });
 
-      setInterval(createFallingText, CONTINUOUS_TEXT_INTERVAL);
-      setInterval(createFallingHeart, CONTINUOUS_HEART_INTERVAL);
-      setInterval(createFallingImage, CONTINUOUS_IMAGE_INTERVAL);
+      function createInitialBurst() {
+        console.log("Creating initial burst...");
 
-      const initialBurst = window.innerWidth <= 768 ? 30 : 35;
-      const initialHearts = 5;
-      const initialImages = 3;
-
-      for (let i = 0; i < initialBurst; i++) {
-        setTimeout(createFallingText, i * 80);
-      }
-
-      for (let i = 0; i < initialHearts; i++) {
-        setTimeout(createFallingHeart, i * 100);
-      }
-
-      for (let i = 0; i < initialImages; i++) {
-        setTimeout(createFallingImage, i * 300);
-      }
-
-      setInterval(() => {
-        if (!isRunning) return;
-        for (let i = 0; i < 5; i++) {
-          setTimeout(createFallingHeart, i * 80);
+        for (let i = 0; i < CONFIG.text.initialBurst; i++) {
+          setTimeout(createFallingText, i * CONFIG.text.burstDelay);
         }
-      }, 12000);
 
-      setInterval(() => {
-        if (!isRunning) return;
-        for (let i = 0; i < 2; i++) {
-          setTimeout(createFallingImage, i * 400);
+        for (let i = 0; i < CONFIG.heart.initialBurst; i++) {
+          setTimeout(createFallingHeart, i * CONFIG.heart.burstDelay);
         }
-      }, 15000);
+
+        for (let i = 0; i < CONFIG.image.initialBurst; i++) {
+          setTimeout(createFallingImage, i * CONFIG.image.burstDelay);
+        }
+      }
+
+      function initApp() {
+        console.log("App initializing...");
+        createInitialBurst();
+        startAllIntervals();
+        console.log("App initialized!");
+      }
+
+      initApp();
     </script>
   </body>
 </html>
